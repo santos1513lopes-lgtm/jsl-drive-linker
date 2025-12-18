@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JSL Multi-Linker | Drive & Dropbox</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233b82f6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4%22/><polyline points=%227 10 12 15 17 10%22/><line x1=%2212%22 y1=%2215%22 x2=%2212%22 y2=%223%22/></svg>">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +17,9 @@
         .input-box:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
         .btn-gradient { background: linear-gradient(to right, #2563eb, #3b82f6); }
         .btn-gradient:hover { background: linear-gradient(to right, #1d4ed8, #2563eb); }
-        .icon-brand { font-size: 1.5rem; }
+        /* Animação suave */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .result-box { animation: fadeIn 0.3s ease-out; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -23,24 +28,24 @@
         
         <div class="text-center mb-8">
             <div class="flex items-center justify-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center transform hover:scale-110 transition-transform">
                     <i class="fa-brands fa-google-drive text-2xl text-blue-500"></i>
                 </div>
                 <div class="text-gray-500 font-bold">+</div>
-                <div class="w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center transform hover:scale-110 transition-transform">
                     <i class="fa-brands fa-dropbox text-2xl text-blue-400"></i>
                 </div>
             </div>
             <h1 class="text-2xl font-black tracking-tight">JSL Multi-Linker</h1>
-            <p class="text-gray-400 text-sm mt-2">Suporta Google Drive e Dropbox</p>
+            <p class="text-gray-400 text-sm mt-2">Gerador de Download Direto (Drive & Dropbox)</p>
         </div>
 
         <div class="space-y-4">
             <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">Cole seu Link Aqui</label>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">Cole seu Link de Compartilhamento</label>
                 <div class="relative">
                     <i class="fa-solid fa-link absolute left-4 top-4 text-gray-500"></i>
-                    <input type="text" id="originalLink" placeholder="Ex: Drive ou Dropbox..." 
+                    <input type="text" id="originalLink" placeholder="Ex: Link do Google Drive ou Dropbox..." 
                            class="w-full input-box p-3 pl-10 rounded-xl text-white placeholder-gray-600 w-full">
                 </div>
             </div>
@@ -53,29 +58,29 @@
         <div id="resultArea" class="hidden mt-8 pt-8 border-t border-gray-700 result-box">
             <div class="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-4">
                 <label class="flex justify-between text-xs font-bold text-green-400 uppercase mb-2">
-                    <span>✅ Link Gerado!</span>
-                    <span id="platformTag" class="text-white bg-green-600 px-2 rounded text-[10px]">DETECTADO</span>
+                    <span>✅ Link Direto Gerado!</span>
+                    <span id="platformTag" class="text-white bg-green-600 px-2 rounded text-[10px] tracking-wider font-bold">DETECTADO</span>
                 </label>
                 <div class="flex gap-2">
-                    <input type="text" id="finalLink" readonly class="w-full bg-[#0f172a] border border-green-500/30 rounded-lg p-2 text-sm text-gray-300 select-all">
-                    <button onclick="copiarLink()" class="bg-green-600 hover:bg-green-500 text-white px-4 rounded-lg transition-colors">
+                    <input type="text" id="finalLink" readonly class="w-full bg-[#0f172a] border border-green-500/30 rounded-lg p-2 text-sm text-gray-300 select-all font-mono">
+                    <button onclick="copiarLink()" class="bg-green-600 hover:bg-green-500 text-white px-4 rounded-lg transition-colors" title="Copiar">
                         <i class="fa-regular fa-copy"></i>
                     </button>
                 </div>
             </div>
 
             <div class="flex gap-3">
-                <a id="btnTestar" href="#" target="_blank" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white text-center py-2.5 rounded-lg text-sm font-bold transition-colors">
-                    <i class="fa-solid fa-download mr-1"></i> Testar
+                <a id="btnTestar" href="#" target="_blank" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white text-center py-2.5 rounded-lg text-sm font-bold transition-colors flex items-center justify-center">
+                    <i class="fa-solid fa-download mr-2"></i> Baixar Agora
                 </a>
-                <button onclick="limpar()" class="px-4 py-2.5 rounded-lg border border-gray-600 text-gray-400 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                <button onclick="limpar()" class="px-4 py-2.5 rounded-lg border border-gray-600 text-gray-400 hover:text-white hover:bg-gray-700 transition-colors text-sm font-bold">
                     Limpar
                 </button>
             </div>
         </div>
 
-        <div id="errorMsg" class="hidden mt-4 text-center text-red-400 text-sm font-bold bg-red-500/10 p-2 rounded-lg"></div>
-        <p class="text-center text-xs text-gray-600 mt-8">Ferramenta JSL © 2025</p>
+        <div id="errorMsg" class="hidden mt-4 text-center text-red-300 text-sm font-bold bg-red-500/20 border border-red-500/30 p-3 rounded-xl result-box"></div>
+        <p class="text-center text-xs text-gray-600 mt-8 font-medium">Ferramenta JSL © 2025</p>
     </div>
 
     <script>
@@ -102,6 +107,7 @@
                 if (fileId) {
                     novoLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
                     plataforma = "GOOGLE DRIVE";
+                    tag.className = "text-white bg-blue-600 px-2 rounded text-[10px] tracking-wider font-bold";
                 }
             } 
             // 2. Lógica DROPBOX
@@ -112,15 +118,18 @@
                 } else if (input.includes("&dl=0")) {
                     novoLink = input.replace("&dl=0", "&dl=1");
                 } else if (!input.includes("dl=")) {
-                    novoLink = input + "?dl=1";
+                    // Verifica se já tem outros parâmetros (?) ou não
+                    novoLink = input + (input.includes('?') ? "&dl=1" : "?dl=1");
                 } else {
-                    novoLink = input; // Já pode ser dl=1
+                    // Se já tiver dl=1 ou outra coisa, assume que está ok
+                    novoLink = input.replace(/dl=\d/, "dl=1");
                 }
                 plataforma = "DROPBOX";
+                tag.className = "text-white bg-blue-400 px-2 rounded text-[10px] tracking-wider font-bold";
             }
             // 3. Lógica MEGA (Aviso)
-            else if (input.includes("mega.nz")) {
-                errorMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> O MEGA não permite links diretos simples por causa da criptografia.';
+            else if (input.includes("mega.nz") || input.includes("mega.io")) {
+                errorMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i> O MEGA usa criptografia e não permite links diretos simples.';
                 errorMsg.classList.remove('hidden');
                 resultArea.classList.add('hidden');
                 return;
@@ -135,7 +144,7 @@
                 resultArea.classList.remove('hidden');
             } else {
                 resultArea.classList.add('hidden');
-                errorMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Link não reconhecido (Use Drive ou Dropbox).';
+                errorMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-2"></i> Link não reconhecido. Use links do Google Drive ou Dropbox.';
                 errorMsg.classList.remove('hidden');
             }
         }
