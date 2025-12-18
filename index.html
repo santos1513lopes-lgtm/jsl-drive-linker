@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSL Multi-Linker | Drive & Dropbox</title>
+    <title>JSL Link Manager v2.0</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233b82f6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4%22/><polyline points=%227 10 12 15 17 10%22/><line x1=%2212%22 y1=%2215%22 x2=%2212%22 y2=%223%22/></svg>">
 
@@ -17,54 +17,64 @@
         .input-box:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
         .btn-gradient { background: linear-gradient(to right, #2563eb, #3b82f6); }
         .btn-gradient:hover { background: linear-gradient(to right, #1d4ed8, #2563eb); }
-        /* Animação suave */
+        .card-saved { transition: transform 0.2s; }
+        .card-saved:hover { transform: translateY(-2px); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .result-box { animation: fadeIn 0.3s ease-out; }
+        .animate-fade { animation: fadeIn 0.3s ease-out; }
+        
+        /* Scrollbar fina para a lista */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
 
-    <div class="w-full max-w-lg bg-[#1e293b]/50 backdrop-blur-lg border border-gray-700 p-8 rounded-2xl shadow-2xl">
+    <div class="w-full max-w-2xl bg-[#1e293b]/50 backdrop-blur-lg border border-gray-700 p-6 md:p-8 rounded-2xl shadow-2xl mb-8">
         
         <div class="text-center mb-8">
             <div class="flex items-center justify-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center transform hover:scale-110 transition-transform">
-                    <i class="fa-brands fa-google-drive text-2xl text-blue-500"></i>
-                </div>
+                <i class="fa-brands fa-google-drive text-3xl text-blue-500"></i>
                 <div class="text-gray-500 font-bold">+</div>
-                <div class="w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center transform hover:scale-110 transition-transform">
-                    <i class="fa-brands fa-dropbox text-2xl text-blue-400"></i>
-                </div>
+                <i class="fa-brands fa-dropbox text-3xl text-blue-400"></i>
             </div>
-            <h1 class="text-2xl font-black tracking-tight">JSL Multi-Linker</h1>
-            <p class="text-gray-400 text-sm mt-2">Gerador de Download Direto (Drive & Dropbox)</p>
+            <h1 class="text-2xl md:text-3xl font-black tracking-tight">JSL Link Manager</h1>
+            <p class="text-gray-400 text-sm mt-2">Gere, baixe e salve seus links diretos.</p>
         </div>
 
         <div class="space-y-4">
             <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">Cole seu Link de Compartilhamento</label>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">Link de Compartilhamento</label>
                 <div class="relative">
                     <i class="fa-solid fa-link absolute left-4 top-4 text-gray-500"></i>
-                    <input type="text" id="originalLink" placeholder="Ex: Link do Google Drive ou Dropbox..." 
-                           class="w-full input-box p-3 pl-10 rounded-xl text-white placeholder-gray-600 w-full">
+                    <input type="text" id="originalLink" placeholder="Cole o link do Google Drive ou Dropbox aqui..." 
+                           class="w-full input-box p-3 pl-10 rounded-xl text-white placeholder-gray-600">
                 </div>
             </div>
 
             <button onclick="detectarEGerar()" class="w-full btn-gradient text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2">
-                <i class="fa-solid fa-bolt"></i> Converter Link
+                <i class="fa-solid fa-bolt"></i> Gerar Link Direto
             </button>
         </div>
 
-        <div id="resultArea" class="hidden mt-8 pt-8 border-t border-gray-700 result-box">
+        <div id="resultArea" class="hidden mt-8 pt-8 border-t border-gray-700 animate-fade">
             <div class="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-4">
-                <label class="flex justify-between text-xs font-bold text-green-400 uppercase mb-2">
-                    <span>✅ Link Direto Gerado!</span>
-                    <span id="platformTag" class="text-white bg-green-600 px-2 rounded text-[10px] tracking-wider font-bold">DETECTADO</span>
-                </label>
-                <div class="flex gap-2">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold text-green-400 uppercase">✅ Link Gerado!</label>
+                    <span id="platformTag" class="text-[10px] font-bold px-2 py-0.5 rounded text-white bg-gray-600">--</span>
+                </div>
+                
+                <div class="flex gap-2 mb-4">
                     <input type="text" id="finalLink" readonly class="w-full bg-[#0f172a] border border-green-500/30 rounded-lg p-2 text-sm text-gray-300 select-all font-mono">
-                    <button onclick="copiarLink()" class="bg-green-600 hover:bg-green-500 text-white px-4 rounded-lg transition-colors" title="Copiar">
+                    <button onclick="copiarLink('finalLink')" class="bg-green-600 hover:bg-green-500 text-white px-4 rounded-lg transition-colors" title="Copiar">
                         <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+
+                <div class="flex gap-2 items-center bg-[#0f172a]/50 p-2 rounded-lg border border-gray-600/30">
+                    <input type="text" id="saveName" placeholder="Nome do arquivo (ex: Apostila 01)" class="bg-transparent text-sm text-white w-full px-2 outline-none placeholder-gray-500">
+                    <button onclick="salvarLink()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded-md whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> SALVAR
                     </button>
                 </div>
             </div>
@@ -79,11 +89,28 @@
             </div>
         </div>
 
-        <div id="errorMsg" class="hidden mt-4 text-center text-red-300 text-sm font-bold bg-red-500/20 border border-red-500/30 p-3 rounded-xl result-box"></div>
-        <p class="text-center text-xs text-gray-600 mt-8 font-medium">Ferramenta JSL © 2025</p>
+        <div id="errorMsg" class="hidden mt-4 text-center text-red-300 text-sm font-bold bg-red-500/20 border border-red-500/30 p-3 rounded-xl animate-fade"></div>
     </div>
 
+    <div id="librarySection" class="w-full max-w-2xl hidden animate-fade">
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 pl-2">
+            <i class="fa-solid fa-book-bookmark text-yellow-500"></i> Minha Biblioteca
+        </h2>
+        
+        <div id="savedList" class="space-y-3 max-h-[400px] overflow-y-auto custom-scroll pr-2">
+            </div>
+        
+        <div class="text-center mt-4">
+            <button onclick="limparTudo()" class="text-xs text-red-400 hover:text-red-300 underline">Apagar todos os links salvos</button>
+        </div>
+    </div>
+
+    <p class="text-center text-xs text-gray-600 mt-8 mb-4">Ferramenta JSL © 2025</p>
+
     <script>
+        // --- 1. LÓGICA DO GERADOR ---
+        let currentDirectLink = ""; // Guarda o link atual para salvar
+
         function detectarEGerar() {
             const input = document.getElementById('originalLink').value.trim();
             const resultArea = document.getElementById('resultArea');
@@ -94,67 +121,76 @@
 
             let novoLink = "";
             let plataforma = "";
+            let corTag = "";
 
-            // 1. Lógica GOOGLE DRIVE
             if (input.includes("drive.google.com")) {
                 const regex = /\/d\/([a-zA-Z0-9_-]+)/;
                 const match = input.match(regex);
                 const regexId = /id=([a-zA-Z0-9_-]+)/;
                 const matchId = input.match(regexId);
-                
                 let fileId = match ? match[1] : (matchId ? matchId[1] : null);
 
                 if (fileId) {
                     novoLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
                     plataforma = "GOOGLE DRIVE";
-                    tag.className = "text-white bg-blue-600 px-2 rounded text-[10px] tracking-wider font-bold";
+                    corTag = "bg-blue-600";
                 }
             } 
-            // 2. Lógica DROPBOX
             else if (input.includes("dropbox.com")) {
-                // Substitui dl=0 por dl=1 ou adiciona dl=1 se não existir
-                if (input.includes("?dl=0")) {
-                    novoLink = input.replace("?dl=0", "?dl=1");
-                } else if (input.includes("&dl=0")) {
-                    novoLink = input.replace("&dl=0", "&dl=1");
-                } else if (!input.includes("dl=")) {
-                    // Verifica se já tem outros parâmetros (?) ou não
-                    novoLink = input + (input.includes('?') ? "&dl=1" : "?dl=1");
-                } else {
-                    // Se já tiver dl=1 ou outra coisa, assume que está ok
-                    novoLink = input.replace(/dl=\d/, "dl=1");
-                }
+                if (input.includes("?dl=0")) novoLink = input.replace("?dl=0", "?dl=1");
+                else if (input.includes("&dl=0")) novoLink = input.replace("&dl=0", "&dl=1");
+                else if (!input.includes("dl=")) novoLink = input + (input.includes('?') ? "&dl=1" : "?dl=1");
+                else novoLink = input.replace(/dl=\d/, "dl=1");
+                
                 plataforma = "DROPBOX";
-                tag.className = "text-white bg-blue-400 px-2 rounded text-[10px] tracking-wider font-bold";
+                corTag = "bg-blue-400";
             }
-            // 3. Lógica MEGA (Aviso)
             else if (input.includes("mega.nz") || input.includes("mega.io")) {
-                errorMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i> O MEGA usa criptografia e não permite links diretos simples.';
-                errorMsg.classList.remove('hidden');
-                resultArea.classList.add('hidden');
+                mostrarErro('<i class="fa-solid fa-triangle-exclamation mr-2"></i> MEGA não suportado (criptografia).');
                 return;
             }
 
-            // Exibir Resultado ou Erro Genérico
             if (novoLink) {
+                currentDirectLink = novoLink;
                 finalLinkInput.value = novoLink;
                 btnTestar.href = novoLink;
                 tag.innerText = plataforma;
+                tag.className = `text-[10px] font-bold px-2 py-0.5 rounded text-white ${corTag}`;
+                
                 errorMsg.classList.add('hidden');
                 resultArea.classList.remove('hidden');
+                document.getElementById('saveName').focus(); // Foca no nome para salvar rápido
             } else {
-                resultArea.classList.add('hidden');
-                errorMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-2"></i> Link não reconhecido. Use links do Google Drive ou Dropbox.';
-                errorMsg.classList.remove('hidden');
+                mostrarErro('<i class="fa-solid fa-circle-exclamation mr-2"></i> Link inválido ou não reconhecido.');
             }
         }
 
-        function copiarLink() {
-            const copyText = document.getElementById("finalLink");
+        function mostrarErro(msg) {
+            const errorMsg = document.getElementById('errorMsg');
+            const resultArea = document.getElementById('resultArea');
+            resultArea.classList.add('hidden');
+            errorMsg.innerHTML = msg;
+            errorMsg.classList.remove('hidden');
+        }
+
+        function copiarLink(elementId) {
+            const copyText = document.getElementById(elementId);
+            if(!copyText) return; // Se for string direta, tratamos diferente (future update)
+            
             copyText.select();
-            copyText.setSelectionRange(0, 99999); 
+            copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
-            const btn = document.querySelector('button[onclick="copiarLink()"]');
+            
+            // Feedback visual no botão que foi clicado
+            const btn = document.activeElement;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+            setTimeout(() => { btn.innerHTML = originalHTML; }, 1500);
+        }
+        
+        // Copiar texto direto (para a lista)
+        function copiarTexto(texto, btn) {
+            navigator.clipboard.writeText(texto);
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-check"></i>';
             setTimeout(() => { btn.innerHTML = originalHTML; }, 1500);
@@ -162,9 +198,103 @@
 
         function limpar() {
             document.getElementById('originalLink').value = "";
+            document.getElementById('saveName').value = "";
             document.getElementById('resultArea').classList.add('hidden');
             document.getElementById('errorMsg').classList.add('hidden');
-            document.getElementById('originalLink').focus();
+            currentDirectLink = "";
+        }
+
+        // --- 2. SISTEMA DE SALVAMENTO (LIBRARY) ---
+        
+        // Carregar ao iniciar
+        document.addEventListener('DOMContentLoaded', carregarBiblioteca);
+
+        function salvarLink() {
+            const nome = document.getElementById('saveName').value.trim();
+            if (!nome) { alert("Dê um nome para salvar o link!"); return; }
+            if (!currentDirectLink) return;
+
+            const novoItem = {
+                id: Date.now(),
+                nome: nome,
+                link: currentDirectLink,
+                data: new Date().toLocaleDateString('pt-BR')
+            };
+
+            let biblioteca = JSON.parse(localStorage.getItem('jsl_links') || '[]');
+            biblioteca.unshift(novoItem); // Adiciona no topo
+            localStorage.setItem('jsl_links', JSON.stringify(biblioteca));
+
+            carregarBiblioteca();
+            document.getElementById('saveName').value = ""; // Limpa campo
+            // Feedback sutil
+            const btn = document.querySelector('button[onclick="salvarLink()"]');
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> SALVO';
+            setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1"></i> SALVAR'; }, 2000);
+        }
+
+        function carregarBiblioteca() {
+            const lista = document.getElementById('savedList');
+            const section = document.getElementById('librarySection');
+            const biblioteca = JSON.parse(localStorage.getItem('jsl_links') || '[]');
+
+            if (biblioteca.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            lista.innerHTML = "";
+
+            biblioteca.forEach(item => {
+                // Define ícone baseado no link
+                let iconClass = "fa-link";
+                let iconColor = "text-gray-400";
+                if(item.link.includes("drive.google")) { iconClass = "fa-google-drive"; iconColor = "text-blue-500"; }
+                else if(item.link.includes("dropbox")) { iconClass = "fa-dropbox"; iconColor = "text-blue-400"; }
+
+                const card = document.createElement('div');
+                card.className = "bg-[#1e293b] border border-gray-700 rounded-xl p-4 flex items-center justify-between card-saved group";
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-brands ${iconClass} ${iconColor} text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h3 class="font-bold text-sm text-white truncate group-hover:text-blue-400 transition-colors">${item.nome}</h3>
+                            <p class="text-[10px] text-gray-500 truncate">${item.data}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="copiarTexto('${item.link}', this)" class="w-8 h-8 rounded-lg bg-gray-700 hover:bg-green-600 text-gray-300 hover:text-white transition-all flex items-center justify-center" title="Copiar Link">
+                            <i class="fa-regular fa-copy text-xs"></i>
+                        </button>
+                        <a href="${item.link}" target="_blank" class="w-8 h-8 rounded-lg bg-gray-700 hover:bg-blue-600 text-gray-300 hover:text-white transition-all flex items-center justify-center" title="Baixar">
+                            <i class="fa-solid fa-download text-xs"></i>
+                        </a>
+                        <button onclick="apagarItem(${item.id})" class="w-8 h-8 rounded-lg bg-gray-700 hover:bg-red-500/20 text-gray-300 hover:text-red-500 border border-transparent hover:border-red-500/50 transition-all flex items-center justify-center" title="Apagar">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                lista.appendChild(card);
+            });
+        }
+
+        function apagarItem(id) {
+            if(!confirm("Tem certeza que quer remover este link?")) return;
+            let biblioteca = JSON.parse(localStorage.getItem('jsl_links') || '[]');
+            biblioteca = biblioteca.filter(item => item.id !== id);
+            localStorage.setItem('jsl_links', JSON.stringify(biblioteca));
+            carregarBiblioteca();
+        }
+
+        function limparTudo() {
+            if(confirm("ATENÇÃO: Isso vai apagar todos os links salvos. Continuar?")) {
+                localStorage.removeItem('jsl_links');
+                carregarBiblioteca();
+            }
         }
     </script>
 </body>
